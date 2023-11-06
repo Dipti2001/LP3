@@ -1,0 +1,46 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
+
+# Load and preprocess the dataset
+data = pd.read_csv('uber_dataset.csv').dropna()
+label_encoder = LabelEncoder()
+data['pickup_location'] = label_encoder.fit_transform(data['pickup_location'])
+data['dropoff_location'] = label_encoder.fit_transform(data['dropoff_location'])
+
+# Identify outliers and show boxplot
+Q1, Q3 = data.quantile(0.25), data.quantile(0.75)
+IQR = Q3 - Q1
+outliers = ((data < (Q1 - 1.5 * IQR)) | (data > (Q3 + 1.5 * IQR))).any(axis=1)
+outlier_count = outliers.sum()
+plt.boxplot(data['fare'])
+plt.title('Fare Prices before Outlier Removal')
+plt.ylabel('Fare Prices')
+plt.show()
+
+# Prepare for modeling
+X, y = data[['pickup_location', 'dropoff_location']], data['fare']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Linear Regression
+linear_reg = LinearRegression().fit(X_train, y_train)
+y_pred_linear = linear_reg.predict(X_test)
+
+# Random Forest Regression
+rf_regressor = RandomForestRegressor(n_estimators=100, random_state=42).fit(X_train, y_train)
+y_pred_rf = rf_regressor.predict(X_test)
+
+# Evaluate models
+r2_linear, rmse_linear = r2_score(y_test, y_pred_linear), np.sqrt(mean_squared_error(y_test, y_pred_linear))
+r2_rf, rmse_rf = r2_score(y_test, y_pred_rf), np.sqrt(mean_squared_error(y_test, y_pred_rf))
+
+print(f"Outliers: {outlier_count}\n")
+print("Linear Regression Model Scores:")
+print(f"R2 Score: {r2_linear}\nRMSE: {rmse_linear}\n")
+print("Random Forest Regression Model Scores:")
+print(f"R2 Score: {r2_rf}\nRMSE: {rmse_rf}")
