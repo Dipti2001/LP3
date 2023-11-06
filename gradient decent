@@ -1,0 +1,26 @@
+# Function to calculate the derivative of the function
+def derivative(x):
+    return 2 * (x + 3)
+
+# Gradient Descent Algorithm
+def gradient_descent(learning_rate, threshold, x):
+    iteration = 0
+    while True:
+        gradient = derivative(x)
+        x_new = x - learning_rate * gradient
+        if abs(x_new - x) < threshold:
+            break
+        x = x_new
+        iteration += 1
+    return x, iteration
+
+# Initial point and parameters
+initial_x = 2
+learning_rate = 0.1
+threshold = 0.0001
+
+# Run Gradient Descent
+local_minima, iterations = gradient_descent(learning_rate, threshold, initial_x)
+
+print(f"Local minima found at x = {local_minima}")
+print(f"Iterations required: {iterations}")
