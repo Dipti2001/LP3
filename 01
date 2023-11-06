@@ -1,0 +1,36 @@
+def knapsack_01(values, weights, capacity):
+    n = len(values)
+    dp = [0] * (capacity + 1)
+
+    for i in range(n):
+        for w in range(capacity, weights[i] - 1, -1):
+            dp[w] = max(dp[w], values[i] + dp[w - weights[i]])
+
+    w = capacity
+    selected_items = []
+    for i in range(n - 1, -1, -1):
+        if dp[w] != dp[w - weights[i]]:
+            selected_items.append(i)
+            w -= weights[i]
+
+    selected_items.reverse()
+    return dp[capacity], selected_items
+
+num_of_items = int(input("Enter the number of items: "))
+print("Enter values for each item:")
+values = []
+for i in range(num_of_items):
+    value = int(input("Enter value for item {}: ".format(i + 1)))
+    values.append(value)
+
+print("Enter weights for each item:")
+weights = []
+for i in range(num_of_items):
+    weight = int(input("Enter weight for item {}: ".format(i + 1)))
+    weights.append(weight)
+
+knapsack_capacity = int(input("Enter the knapsack capacity: "))
+
+max_value, selected_items = knapsack_01(values, weights, knapsack_capacity)
+print("Maximum value in the knapsack:", max_value)
+print("Items selected:", selected_items)
