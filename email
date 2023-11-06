@@ -1,0 +1,41 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report
+
+# Load dataset (Replace 'email_dataset.csv' with your dataset)
+data = pd.read_csv('email_dataset.csv') 
+
+# Preprocess the dataset
+label_encoder = LabelEncoder()
+data['Spam'] = label_encoder.fit_transform(data['Spam'])  # Converting 'Spam' column to binary labels
+
+# Split data into features and target
+X = data.drop('Spam', axis=1)  # Features
+y = data['Spam']  # Target
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# K-Nearest Neighbors (KNN)
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+knn_predictions = knn.predict(X_test)
+
+# Support Vector Machine (SVM)
+svm = SVC(kernel='linear')
+svm.fit(X_train, y_train)
+svm_predictions = svm.predict(X_test)
+
+# Analyze performance
+print("K-Nearest Neighbors (KNN) Performance:")
+print("Accuracy:", accuracy_score(y_test, knn_predictions))
+print("Classification Report:")
+print(classification_report(y_test, knn_predictions))
+
+print("\nSupport Vector Machine (SVM) Performance:")
+print("Accuracy:", accuracy_score(y_test, svm_predictions))
+print("Classification Report:")
+print(classification_report(y_test, svm_predictions))
