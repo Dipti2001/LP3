@@ -1,0 +1,41 @@
+rom collections import Counter
+
+class Node:
+    def __init__(self, char):
+        self.char = char
+        self.left = None
+        self.right = None
+
+def huffmanencoding(data):
+    freq = dict(Counter(data))
+    priority_queue = [(freq, Node(char)) for char, freq in freq.items()]
+
+    while len(priority_queue) > 1:
+        priority_queue.sort(key=lambda x: x[0])
+        left_freq, left = priority_queue.pop(0)
+        right_freq, right = priority_queue.pop(0)
+        merged = Node(None)
+        merged.left, merged.right = left, right
+        priority_queue.append((left_freq + right_freq, merged))
+
+    root = priority_queue[0][1]
+    codes = {}
+
+    def generatecodes(node, code=""):
+        if node:
+            if node.char:
+              codes[node.char] = code
+            generatecodes(node.left, code + '0')
+            generatecodes(node.right, code + '1')
+
+    generatecodes(root)
+    encoded_data = ''.join(codes[char] for char in data)
+    return encoded_data, codes
+
+user_input = input("Enter a string : ")
+encoded_data, codes = huffmanencoding(user_input)
+print(f"Original data: {user_input}")
+print(f"Encoded data: {encoded_data}")
+print("Huffman Codes:")
+for char, code in codes.items():
+    print(char,':', code)
